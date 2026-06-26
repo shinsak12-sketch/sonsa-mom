@@ -105,7 +105,6 @@
   .cb-tit{font-size:18px;font-weight:800;letter-spacing:-.4px;}
   .cb-sub{font-size:13.5px;opacity:.9;margin-top:5px;}
   .cb-arr{flex:none;font-size:14px;font-weight:800;background:#fff;color:var(--db-green-d);padding:12px 20px;border-radius:999px;position:relative;z-index:1;white-space:nowrap;}
-  @media(max-width:560px){.calc-banner{flex-direction:column;text-align:center;}.cb-arr{width:100%;}}
   .foot-in{max-width:960px;margin:0 auto;padding:54px 22px;}
   .foot-in h3{font-size:20px;margin-bottom:8px;}
   .foot-in .fsub{opacity:.7;font-size:14px;margin-bottom:26px;}
@@ -116,7 +115,50 @@
   .ct .tel{font-size:18px;font-weight:800;color:var(--tip);letter-spacing:.5px;}
   .fnote{font-size:11.5px;opacity:.55;line-height:1.8;border-top:1px solid rgba(255,255,255,.12);padding-top:18px;}
   @media(max-width:820px){.grid{grid-template-columns:repeat(2,1fr);}}
-  @media(max-width:520px){.grid{grid-template-columns:1fr;}.spec{flex-direction:column;gap:3px;}.spec .k{width:auto;}.hero-mid{padding:10px 22px 30px;}}
+
+  /* ===== 모바일 통합 (≤600px) ===== */
+  @media(max-width:600px){
+    .hero{min-height:auto;padding-bottom:36px;}
+    .topbar{padding:16px 18px;font-size:13px;gap:7px;flex-wrap:wrap;}
+    .topbar .logo-img{height:22px;padding:6px 10px;}
+    .hero-mid{padding:18px 20px 26px;justify-content:flex-start;}
+    .hero .blob{display:none;}
+    .eyebrow{font-size:11.5px;padding:6px 13px;margin-bottom:16px;letter-spacing:.5px;}
+    .hero h1{font-size:30px;letter-spacing:-1px;line-height:1.18;}
+    .hero .lead{margin-top:16px;font-size:15px;line-height:1.55;}
+    .hero .stats{flex-direction:column;gap:10px;margin-top:26px;}
+    .hero .stat{width:100%;min-width:0;padding:14px 16px;gap:12px;}
+    .hero .stat .n{font-size:24px;}
+    .hero .stat .l{font-size:12.5px;}
+    .cta-row{flex-direction:column;align-items:stretch;gap:10px;margin-top:28px;}
+    .hero .cta{margin-top:0;justify-content:center;width:100%;font-size:15px;padding:15px 22px;}
+    .scroll-hint{display:none;}
+
+    .section{padding:46px 18px 20px;}
+    .sec-tit h2{font-size:23px;}
+    .sec-tit p{font-size:14px;}
+    .filters{gap:7px;margin:24px 0 6px;}
+    .chip{font-size:13px;padding:8px 15px;}
+    .grid{grid-template-columns:1fr;gap:14px;margin-top:20px;}
+    .tile{min-height:0;padding:20px 18px;}
+
+    .calc-banner{flex-direction:column;text-align:center;gap:14px;padding:24px 22px;margin-top:34px;}
+    .cb-arr{width:100%;}
+    .cb-tit{font-size:16.5px;}
+
+    .modal{max-height:92vh;}
+    .m-head{padding:20px 20px 16px;gap:12px;}
+    .m-head .mico{width:42px;height:42px;font-size:21px;}
+    .m-head h3{font-size:18px;}
+    .m-body{padding:18px 20px 28px;}
+    .spec{flex-direction:column;gap:3px;}
+    .spec .k{width:auto;}
+
+    .foot-in{padding:40px 18px;}
+    .foot-in h3{font-size:18px;}
+    .ct{flex-direction:column;gap:12px;}
+    .ct .box{min-width:0;padding:16px 18px;}
+  }
 </style>
 </head>
 <body>
