@@ -100,6 +100,20 @@
     border-radius:22px;padding:26px 30px;box-shadow:0 12px 34px rgba(0,133,74,.22);transition:.2s;position:relative;overflow:hidden;}
   .calc-banner::after{content:"";position:absolute;right:-30px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,184,0,.16);}
   .calc-banner:hover{transform:translateY(-3px);box-shadow:0 18px 42px rgba(0,133,74,.3);}
+  .forms{margin-top:44px;}
+  .forms-tit{text-align:center;margin-bottom:24px;}
+  .forms-tit h3{font-size:clamp(20px,3vw,26px);font-weight:800;letter-spacing:-.5px;color:var(--db-dark);margin-top:8px;}
+  .forms-tit p{color:var(--muted);font-size:14px;margin-top:8px;}
+  .forms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  .form-card{display:flex;align-items:center;gap:14px;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;transition:.18s;}
+  .form-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(20,36,28,.1);border-color:var(--db-green);}
+  .fc-ico{flex:none;width:46px;height:46px;border-radius:13px;background:var(--mint);display:flex;align-items:center;justify-content:center;font-size:23px;}
+  .fc-txt{flex:1;}
+  .fc-nm{font-size:16.5px;font-weight:800;color:var(--db-dark);}
+  .fc-sub{font-size:12.5px;color:var(--muted);margin-top:3px;}
+  .fc-dl{flex:none;font-size:13px;font-weight:800;color:var(--db-green-d);background:#eef6f1;padding:9px 15px;border-radius:999px;white-space:nowrap;}
+  .form-card:hover .fc-dl{background:var(--db-green);color:#fff;}
+  .forms-note{margin-top:16px;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.6;}
   .cb-ico{flex:none;width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:30px;position:relative;z-index:1;}
   .cb-txt{flex:1;position:relative;z-index:1;}
   .cb-tit{font-size:18px;font-weight:800;letter-spacing:-.4px;}
@@ -140,6 +154,7 @@
     .tile{min-height:0;padding:20px 18px;}
 
     .calc-banner{flex-direction:column;text-align:center;gap:14px;padding:24px 22px;margin-top:34px;}
+    .forms-grid{grid-template-columns:1fr;}
     .cb-arr{width:100%;}
     .cb-tit{font-size:16.5px;}
 
@@ -203,6 +218,27 @@
     </div>
     <div class="cb-arr">모성보호 계산기 열기 ↗</div>
   </a>
+
+  <div class="forms">
+    <div class="forms-tit">
+      <div class="kicker">DOWNLOAD</div>
+      <h3>자주 쓰는 서식</h3>
+      <p>휴직·복직 시 필요한 서식을 내려받아 작성하세요</p>
+    </div>
+    <div class="forms-grid">
+      <a class="form-card" href="forms/휴직원.doc" download>
+        <div class="fc-ico">📄</div>
+        <div class="fc-txt"><div class="fc-nm">휴직원</div><div class="fc-sub">육아·가족돌봄·난임 휴직 신청</div></div>
+        <div class="fc-dl">받기 ⬇</div>
+      </a>
+      <a class="form-card" href="forms/복직원.doc" download>
+        <div class="fc-ico">📄</div>
+        <div class="fc-txt"><div class="fc-nm">복직원</div><div class="fc-sub">휴직 종료·복직 시 제출</div></div>
+        <div class="fc-dl">받기 ⬇</div>
+      </a>
+    </div>
+    <div class="forms-note">휴직 중에는 전산 접속이 막혀요. 연장·복직 신청은 서식을 미리 받아 센터장님께 서면으로 제출하세요.</div>
+  </div>
 </main>
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
 <footer class="foot-sec">
