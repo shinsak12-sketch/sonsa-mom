@@ -20,7 +20,9 @@
   .hero .b2{width:280px;height:280px;background:rgba(255,184,0,.16);bottom:-90px;left:-80px;}
   .hero .b3{width:160px;height:160px;background:rgba(255,255,255,.05);top:40%;left:8%;}
   .topbar{position:relative;z-index:3;display:flex;align-items:center;gap:9px;padding:22px 30px;font-size:14px;font-weight:700;letter-spacing:.3px;}
-  .topbar .logo{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.14);padding:6px 14px;border-radius:999px;}
+  .topbar .logo{display:flex;align-items:center;gap:7px;}
+  .topbar .logo-img{height:30px;width:auto;display:block;}
+  .topbar .logo-txt{display:none;align-items:center;gap:7px;background:rgba(255,255,255,.14);padding:6px 14px;border-radius:999px;}
   .topbar .logo .d{width:8px;height:8px;border-radius:50%;background:var(--tip);}
   .hero-mid{position:relative;z-index:3;flex:1;display:flex;flex-direction:column;justify-content:center;padding:10px 30px 30px;max-width:920px;margin:0 auto;width:100%;}
   .eyebrow{display:inline-block;font-size:13px;font-weight:700;letter-spacing:1px;background:rgba(255,184,0,.22);color:#FFE9A8;padding:7px 16px;border-radius:999px;margin-bottom:22px;width:fit-content;}
@@ -28,9 +30,9 @@
   .hero h1 .y{color:var(--tip);}
   .hero .lead{margin-top:22px;font-size:clamp(15px,2.2vw,19px);opacity:.92;max-width:560px;font-weight:500;}
   .hero .stats{display:flex;gap:14px;margin-top:38px;flex-wrap:wrap;}
-  .hero .stat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px 22px;min-width:120px;}
-  .hero .stat .n{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1;}
-  .hero .stat .l{font-size:12.5px;opacity:.8;margin-top:7px;}
+  .hero .stat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px 22px;min-width:140px;display:flex;align-items:center;gap:14px;}
+  .hero .stat .n{font-size:28px;line-height:1;flex:none;}
+  .hero .stat .l{font-size:13px;opacity:.92;line-height:1.4;font-weight:600;}
   .hero .cta{margin-top:42px;display:inline-flex;align-items:center;gap:10px;background:#fff;color:var(--db-green-d);font-weight:800;font-size:16px;padding:16px 30px;border-radius:999px;text-decoration:none;width:fit-content;box-shadow:0 10px 30px rgba(0,0,0,.18);transition:.2s;}
   .hero .cta:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(0,0,0,.24);}
   .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
@@ -120,15 +122,18 @@
 <body>
 <header class="hero">
   <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
-  <div class="topbar"><span class="logo"><span class="d"></span>DB자동차보험손해사정</span><span style="opacity:.7;font-weight:500;">인사지원팀</span></div>
+  <div class="topbar">
+    <span class="logo"><img src="logo.png" alt="DB자동차보험손해사정" class="logo-img" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><span class="logo-txt"><span class="d"></span>DB자동차보험손해사정</span></span>
+    <span style="opacity:.7;font-weight:500;">인사지원팀</span>
+  </div>
   <div class="hero-mid">
     <span class="eyebrow">2026년 6월 · 최신 개정 반영</span>
     <h1>예비 엄마·아빠,<br>이건 <span class="y">꼭</span> 챙기세요</h1>
     <p class="lead">임신부터 출산, 육아, 복직까지 — 우리 회사에서 쓸 수 있는 모성보호제도를 한 화면에 모았어요. 카드를 눌러 상세 조건과 신청 방법을 확인하세요.</p>
     <div class="stats">
-      <div class="stat"><div class="n">10</div><div class="l">핵심 제도</div></div>
-      <div class="stat"><div class="n">20<span style="font-size:15px;">일</span></div><div class="l">배우자 출산휴가</div></div>
-      <div class="stat"><div class="n">250<span style="font-size:15px;">만</span></div><div class="l">육아휴직 급여 상한</div></div>
+      <div class="stat"><div class="n">📋</div><div class="l">임신부터 복직까지<br>제도 10가지 한눈에</div></div>
+      <div class="stat"><div class="n">👨‍👩‍👧</div><div class="l">엄마·아빠<br>모두 사용 가능</div></div>
+      <div class="stat"><div class="n">🧮</div><div class="l">계산기로<br>내 휴가 바로 확인</div></div>
     </div>
     <div class="cta-row">
       <a class="cta" href="#guide">제도 둘러보기 <span>↓</span></a>
@@ -154,7 +159,7 @@
   <a class="calc-banner" href="https://hr-note.vercel.app/field" target="_blank" rel="noopener">
     <div class="cb-ico">🧮</div>
     <div class="cb-txt">
-      <div class="cb-tit">내 휴가·급여, 직접 계산해보세요</div>
+      <div class="cb-tit">내 휴가, 직접 계산해보세요</div>
       <div class="cb-sub">분만예정일·자녀 나이만 넣으면 사용 가능 기간을 바로 확인</div>
     </div>
     <div class="cb-arr">모성보호 계산기 열기 ↗</div>
