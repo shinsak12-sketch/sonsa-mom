@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DB자동차보험손해사정 · 모성보호 계산기</title>
+<style>
+  :root{
+    --db-green:#00854A; --db-green-d:#006B3C; --db-dark:#14241C;
+    --tip:#FFB800; --tip-bg:#FFF6DC; --line:#E4EBE7; --ink:#1d2a23; --muted:#5b6b62; --hl:#FFF1A8;
+    --pink:#FDE7F0; --pink-t:#C2185B; --blue:#E3F0FF; --blue-t:#1565C0;
+    --mint:#E6F5EC; --mint-t:#006B3C; --red:#FDECEA; --red-t:#C0392B; --amber:#FFF6DC; --amber-t:#8A5A00;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Pretendard",sans-serif;background:#f4f7f5;color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .topbar{background:linear-gradient(140deg,#00854A 0%,#006B3C 55%,#04401f 100%);color:#fff;padding:18px 22px;display:flex;align-items:center;gap:14px;}
+  .topbar .back{display:inline-flex;align-items:center;gap:5px;color:#fff;text-decoration:none;font-size:13.5px;font-weight:700;background:rgba(255,255,255,.14);padding:8px 14px 8px 10px;border-radius:999px;flex:none;}
+  .topbar .back:hover{background:rgba(255,255,255,.22);}
+  .topbar .ttl{font-size:15px;font-weight:800;letter-spacing:-.3px;}
+  .wrap{max-width:720px;margin:0 auto;padding:26px 18px 60px;}
+  .page-tit{text-align:center;margin-bottom:22px;}
+  .page-tit .kicker{font-size:12.5px;font-weight:800;color:var(--db-green);letter-spacing:1.5px;}
+  .page-tit h1{font-size:clamp(21px,4vw,28px);font-weight:800;letter-spacing:-.8px;color:var(--db-dark);margin-top:8px;}
+  .page-tit p{color:var(--muted);margin-top:8px;font-size:13.5px;}
+  .tabs{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 10px;margin-bottom:20px;-webkit-overflow-scrolling:touch;}
+  .tab{flex:none;display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff;color:var(--muted);padding:10px 16px;border-radius:999px;transition:.15s;white-space:nowrap;}
+  .tab.on{background:var(--db-green);color:#fff;border-color:var(--db-green);}
+  .tab:hover{border-color:var(--db-green);}
+  .card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px 20px;}
+  .calc-notice{background:var(--tip-bg);border-left:4px solid var(--tip);border-radius:8px;padding:12px 15px;font-size:13px;color:#7a5400;line-height:1.7;margin-bottom:20px;}
+  .calc-notice .lab{font-weight:800;margin-bottom:3px;}
+  .blk{margin-bottom:22px;}
+  .blk:last-child{margin-bottom:0;}
+  .blk-tit{font-size:13.5px;font-weight:800;margin-bottom:10px;color:var(--db-dark);}
+  .blk-sub{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-label{font-size:12px;font-weight:600;color:var(--muted);}
+  input[type=date],input[type=number],select{
+    width:100%;height:42px;border:1px solid var(--line);border-radius:10px;background:#f6faf8;
+    padding:0 12px;font-size:14px;color:var(--ink);outline:none;font-family:inherit;
+  }
+  input:focus,select:focus{border-color:var(--db-green);background:#fff;}
+  .btn-row{display:flex;gap:8px;}
+  .opt-btn{flex:1;padding:11px 8px;border-radius:12px;cursor:pointer;border:2px solid var(--line);background:#fff;color:var(--muted);font-size:12.5px;font-weight:700;text-align:center;font-family:inherit;transition:.15s;}
+  .opt-btn.on{border-color:var(--db-green);background:var(--mint);color:var(--db-green-d);}
+  .opt-btn .oi{font-size:20px;display:block;margin-bottom:4px;}
+  .type-btn{flex:1;padding:10px 4px;border-radius:10px;cursor:pointer;border:2px solid var(--line);background:#fff;color:var(--muted);font-size:13px;font-weight:700;text-align:center;font-family:inherit;}
+  .type-btn.on{border-color:var(--blue-t);background:var(--blue);color:var(--blue-t);}
+  .type-btn .td{font-size:11px;font-weight:400;margin-top:2px;}
+  .info-line{margin-top:10px;font-size:12px;color:var(--muted);background:#f6faf8;border-radius:8px;padding:8px 12px;}
+  .period-row{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:7px;}
+  .period-row.ok{border-color:var(--db-green);}
+  .period-row .prh{display:flex;align-items:center;gap:8px;}
+  .period-row .idx{font-size:11px;font-weight:800;color:var(--muted);width:34px;flex:none;}
+  .period-row input{flex:1;height:36px;font-size:12.5px;padding:0 8px;}
+  .period-row .sep{font-size:11px;color:var(--muted);flex:none;}
+  .period-row .rres{margin-top:6px;font-size:11.5px;font-weight:700;color:var(--db-green-d);}
+  .period-row .rerr{margin-top:6px;font-size:11.5px;color:var(--red-t);}
+  .res-box{border-radius:14px;padding:18px;}
+  .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .res-num{text-align:center;}
+  .res-num .l{font-size:11.5px;color:var(--muted);margin-bottom:4px;}
+  .res-num .n{font-size:24px;font-weight:800;}
+  .res-num .u{font-size:11px;color:var(--muted);}
+  .res-formula{background:rgba(255,255,255,.7);border-radius:8px;padding:9px 11px;margin-bottom:10px;font-size:11.5px;color:var(--muted);line-height:1.8;}
+  .res-formula .ft{font-weight:700;margin-bottom:3px;}
+  .res-status{text-align:center;font-size:13px;font-weight:800;padding:9px 0;border-top:1px solid rgba(0,0,0,.08);}
+  .sched{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .sched .row{display:flex;justify-content:space-between;align-items:center;padding:13px 15px;border-bottom:1px solid var(--line);}
+  .sched .row:last-child{border-bottom:none;}
+  .sched .row .rl{font-size:12px;font-weight:700;}
+  .sched .row .rs{font-size:11px;color:var(--muted);margin-top:2px;}
+  .sched .row .rd{text-align:right;font-size:12.5px;}
+  .sched .row .rd .sub{color:var(--muted);}
+  .fine{font-size:11.5px;color:var(--muted);background:#f6faf8;border-radius:8px;padding:11px 13px;margin-top:16px;line-height:1.8;}
+  .badge{font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:20px;background:var(--db-green);color:#fff;margin-left:8px;}
+  @media(max-width:520px){.res-grid{gap:8px;} .res-num .n{font-size:21px;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="back" href="index.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>제도안내</a>
+  <div class="ttl">🧮 모성보호 계산기</div>
+</div>
+<div class="wrap">
+  <div class="page-tit">
+    <div class="kicker">MATERNITY PROTECTION CALCULATOR</div>
+    <h1>날짜만 넣으면<br>기간이 자동으로 계산돼요</h1>
+    <p>임신·출산·육아휴직·기타 휴가 4가지 계산기를 한 곳에 모았어요</p>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-c="pregnancy">🤱 단축근무</div>
+    <div class="tab" data-c="maternity">🤰 출산전후휴가</div>
+    <div class="tab" data-c="parental">👶 육아휴직</div>
+    <div class="tab" data-c="leave">📋 휴가·휴직 잔여</div>
+  </div>
+
+  <div class="card" id="calc-app"></div>
+
+  <div class="fine" style="margin-top:20px;">
+    ※ 이 계산기의 결과는 참고용이며, 실제 사용기간·급여와 오차가 있을 수 있습니다. 최종 확인은 고용24(work24.go.kr) 또는 손사지원파트를 통해 받으시기 바랍니다.
+  </div>
+</div>
+
+<script>
+/* ===== 공통 유틸 (모두 로컬 타임존 기준으로 안전하게 계산) ===== */
+function pad2(n){return String(n).padStart(2,'0');}
+function parseD(s){return new Date(s+'T00:00:00');}
+function toISO(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function fmt(s, withDay){
+  if(!s) return '-';
+  var d = parseD(s);
+  var out = d.getFullYear()+'.'+pad2(d.getMonth()+1)+'.'+pad2(d.getDate());
+  if(withDay){ var w=['일','월','화','수','목','금','토']; out += ' ('+w[d.getDay()]+')'; }
+  return out;
+}
+function dow(s){var w=['일','월','화','수','목','금','토'];return w[parseD(s).getDay()];}
+function addDays(s, n){var d=parseD(s); d.setDate(d.getDate()+n); return toISO(d);}
+function diffDaysIncl(s1, s2){
+  if(!s1||!s2) return null;
+  var d = Math.round((parseD(s2)-parseD(s1))/86400000)+1;
+  return d>0 ? d : null;
+}
+// 엑셀 DATEDIF 방식 개월+일 합산 (육아휴직 계산기용)
+function calcMonthsAndDays(startStr, endStr){
+  if(!startStr || !endStr) return null;
+  var start = parseD(startStr);
+  var end = parseD(endStr);
+  end.setDate(end.getDate()+1);
+  if(end <= start) return null;
+  var months = (end.getFullYear()-start.getFullYear())*12 + (end.getMonth()-start.getMonth());
+  var t1 = new Date(start); t1.setMonth(t1.getMonth()+months);
+  if(t1 > end) months -= 1;
+  var t2 = new Date(start); t2.setMonth(t2.getMonth()+months);
+  var remainDays = Math.round((end-t2)/86400000);
+  if(remainDays < 0) remainDays = 0;
+  var daysInMonth = new Date(end.getFullYear(), end.getMonth()+1, 0).getDate();
+  var fraction = Math.floor((remainDays/daysInMonth)*1000)/1000;
+  var total = Math.floor((months+fraction)*1000)/1000;
+  return {months:months, remainDays:remainDays, daysInMonth:daysInMonth, fraction:fraction, total:total};
+}
+function calcEndDate(startStr, remainMonths){
+  if(!startStr || remainMonths<=0) return null;
+  var start = parseD(startStr);
+  var fullMonths = Math.floor(remainMonths);
+  var fraction = remainMonths - fullMonths;
+  var q = new Date(start); q.setMonth(q.getMonth()+fullMonths);
+  var daysInMonth = new Date(q.getFullYear(), q.getMonth()+1, 0).getDate();
+  var extraDays = Math.floor(fraction*daysInMonth);
+  q.setDate(q.getDate()-1+extraDays);
+  return toISO(q);
+}
+function todayISO(){var d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+function esc(s){return (s==null?'':String(s));}
+
+var app = document.getElementById('calc-app');
+
+/* ===================== 1) 임신중 근로시간 단축 ===================== */
+var Pregnancy = {
+  state:{dueDate:''},
+  render:function(){
+    var s=this.state;
+    var lastPeriod = s.dueDate ? addDays(s.dueDate,-280) : null;
+    var week12End = lastPeriod ? addDays(lastPeriod,84) : null;
+    var week32Start = lastPeriod ? addDays(lastPeriod,218) : null;
+    var today = todayISO();
+    var isIn12 = week12End && today<=week12End;
+    var isIn32 = week32Start && today>=week32Start;
+
+    var h = '<div class="calc-notice"><div class="lab">📋 임신기 근로시간 단축 제도</div>'
+      +'<div>· <b>임신 후 12주 이내</b> 또는 <b>32주 이후</b> 여성 근로자</div>'
+      +'<div>· 1일 2시간 근로시간 단축 신청 가능, 임금 삭감 불가</div>'
+      +'<div style="margin-top:4px;">※ 근로기준법 제74조제7항</div></div>';
+
+    h += '<div class="blk"><div class="blk-tit">분만예정일 입력</div>'
+      +'<div class="form-group"><label class="form-label">분만예정일 (출산예정일)</label>'
+      +'<input type="date" id="p-due" value="'+esc(s.dueDate)+'"></div></div>';
+
+    h += '<div id="p-results">'+this.renderResults(lastPeriod, week12End, week32Start, isIn12, isIn32, s)+'</div>';
+
+    app.innerHTML = h;
+    document.getElementById('p-due').addEventListener('input', function(e){ Pregnancy.state.dueDate = e.target.value; Pregnancy.updateResults(); });
+  },
+  updateResults:function(){
+    var s=this.state;
+    var lastPeriod = s.dueDate ? addDays(s.dueDate,-280) : null;
+    var week12End = lastPeriod ? addDays(lastPeriod,84) : null;
+    var week32Start = lastPeriod ? addDays(lastPeriod,218) : null;
+    var today = todayISO();
+    var isIn12 = week12End && today<=week12End;
+    var isIn32 = week32Start && today>=week32Start;
+    document.getElementById('p-results').innerHTML = this.renderResults(lastPeriod, week12End, week32Start, isIn12, isIn32, s);
+  },
+  renderResults:function(lastPeriod, week12End, week32Start, isIn12, isIn32, s){
+    if(!s.dueDate || !lastPeriod) return '';
+    var h = '<div class="blk"><div class="blk-tit">기준일 계산</div><div class="sched">'
+      +'<div class="row"><div><div class="rl" style="color:var(--muted);">마지막 생리시작일</div><div class="rs">분만예정일 - 280일</div></div><div class="rd"><b>'+fmt(lastPeriod)+'</b><div class="sub">('+dow(lastPeriod)+')</div></div></div>'
+      +'<div class="row" style="background:var(--pink);"><div><div class="rl" style="color:var(--pink-t);">분만예정일</div><div class="rs">입력값</div></div><div class="rd" style="color:var(--pink-t);"><b>'+fmt(s.dueDate)+'</b><div class="sub" style="color:var(--pink-t);">('+dow(s.dueDate)+')</div></div></div>'
+      +'</div></div>';
+
+    h += '<div class="blk"><div class="blk-tit">단축근무 대상기간</div>';
+
+    h += '<div class="card" style="border:2px solid '+(isIn12?'#3B6D11':'var(--line)')+';background:'+(isIn12?'#EAF3DE':'#fff')+';padding:14px 16px;margin-bottom:10px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><b style="color:#3B6D11;font-size:14px;">① 임신 후 12주 이내</b>'+(isIn12?'<span class="badge">현재 해당</span>':'')+'</div>'
+      +'<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">임신 1일 ~ 84일 (12주 × 7일)</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+      +'<div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--muted);">시작일</div><div style="font-size:13px;font-weight:700;color:#3B6D11;">'+fmt(lastPeriod)+'</div></div>'
+      +'<div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--muted);">마지막 날(12주0일)</div><div style="font-size:13px;font-weight:700;color:#3B6D11;">'+fmt(week12End)+'</div></div>'
+      +'</div></div>';
+
+    h += '<div style="border-radius:10px;padding:10px 14px;background:#f6faf8;border:1px solid var(--line);text-align:center;margin-bottom:10px;">'
+      +'<div style="font-size:12px;font-weight:600;color:var(--muted);">13주 ~ 31주 (단축근무 미해당)</div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-top:2px;">'+fmt(addDays(week12End,1))+' ~ '+fmt(addDays(week32Start,-1))+'</div></div>';
+
+    h += '<div class="card" style="border:2px solid '+(isIn32?'#1A4A8A':'var(--line)')+';background:'+(isIn32?'#E8F0FB':'#fff')+';padding:14px 16px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><b style="color:#1A4A8A;font-size:14px;">② 임신 후 32주 이후</b>'+(isIn32?'<span class="badge" style="background:#1A4A8A;">현재 해당</span>':'')+'</div>'
+      +'<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">임신 218일(31주1일) ~ 분만예정일</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+      +'<div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--muted);">시작일(31주1일)</div><div style="font-size:13px;font-weight:700;color:#1A4A8A;">'+fmt(week32Start)+'</div></div>'
+      +'<div style="background:rgba(255,255,255,.7);border-radius:8px;padding:8px 10px;text-align:center;"><div style="font-size:10px;color:var(--muted);">분만예정일</div><div style="font-size:13px;font-weight:700;color:#1A4A8A;">'+fmt(s.dueDate)+'</div></div>'
+      +'</div></div></div>';
+
+    h += '<div class="fine">※ 계산표의 분만예정일은 임신 40주 기준입니다.<br>※ 실제 임신기간은 의료기관에서 확인하세요.</div>';
+    return h;
+  }
+};
+
+/* ===================== 2) 출산전후휴가 ===================== */
+var Maternity = {
+  // 출산일 포함 필수 보장일수: 사이트 안내(제도 안내 카드)와 동일하게 46일/다태아 61일 기준
+  TYPES:[
+    {label:'일반',totalDays:90,minPostDays:46,paidDays:60},
+    {label:'미숙아',totalDays:100,minPostDays:46,paidDays:60},
+    {label:'다태아',totalDays:120,minPostDays:61,paidDays:75}
+  ],
+  state:{typeLabel:'일반', birthDate:'', startDate:'', usePrenatal:false, prenatalStart:'', prenatalEnd:'', postStart:''},
+  render:function(){
+    var s=this.state;
+    var h='';
+    h+='<div class="blk"><div class="blk-tit">구분 선택</div><div class="btn-row" id="m-types">';
+    this.TYPES.forEach(function(t){
+      h+='<div class="type-btn'+(s.typeLabel===t.label?' on':'')+'" data-t="'+t.label+'">'+t.label+'<div class="td">'+t.totalDays+'일</div></div>';
+    });
+    h+='</div><div class="info-line" id="m-typeinfo"></div></div>';
+
+    h+='<div class="blk"><div class="blk-tit">출산전 분리사용</div><div class="btn-row" style="margin-bottom:12px;" id="m-prenatal-toggle">'
+      +'<div class="opt-btn'+(!s.usePrenatal?' on':'')+'" data-v="0">미사용</div>'
+      +'<div class="opt-btn'+(s.usePrenatal?' on':'')+'" data-v="1">분리사용</div></div>'
+      +'<div id="m-prenatal-fields"></div></div>';
+
+    h+='<div class="blk"><div class="blk-tit">출산일 (예정일)</div>'
+      +'<input type="date" id="m-birth" value="'+esc(s.birthDate)+'"></div>';
+
+    h+='<div id="m-results"></div>';
+
+    app.innerHTML = h;
+    this.bindStatic();
+    this.renderPrenatalFields();
+    this.updateResults();
+  },
+  bindStatic:function(){
+    var self=this;
+    document.querySelectorAll('#m-types .type-btn').forEach(function(el){
+      el.addEventListener('click', function(){ self.state.typeLabel = el.getAttribute('data-t'); self.render(); });
+    });
+    document.querySelectorAll('#m-prenatal-toggle .opt-btn').forEach(function(el){
+      el.addEventListener('click', function(){
+        self.state.usePrenatal = el.getAttribute('data-v')==='1';
+        self.state.prenatalStart=''; self.state.prenatalEnd=''; self.state.startDate=''; self.state.postStart='';
+        self.render();
+      });
+    });
+    document.getElementById('m-birth').addEventListener('input', function(e){ self.state.birthDate=e.target.value; self.updateResults(); });
+  },
+  currentType:function(){ return this.TYPES.find(function(t){return t.label===Maternity.state.typeLabel;}) || this.TYPES[0]; },
+  renderPrenatalFields:function(){
+    var s=this.state, self=this, t=this.currentType();
+    var box = document.getElementById('m-prenatal-fields');
+    var h='';
+    if(!s.usePrenatal){
+      h='<div class="form-group"><label class="form-label">휴가 시작일</label><input type="date" id="m-start" value="'+esc(s.startDate)+'"></div>';
+    }else{
+      h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">'
+        +'<div class="form-group"><label class="form-label">출산전 시작일</label><input type="date" id="m-pstart" value="'+esc(s.prenatalStart)+'"></div>'
+        +'<div class="form-group"><label class="form-label">출산전 종료일</label><input type="date" id="m-pend" value="'+esc(s.prenatalEnd)+'"></div></div>'
+        +'<div id="m-pused" class="info-line" style="margin-bottom:10px;"></div>'
+        +'<div class="form-group"><label class="form-label">출산후 휴가 시작일</label><input type="date" id="m-poststart" value="'+esc(s.postStart)+'"></div>'
+        +'<div class="fine" style="margin-top:8px;">※ 출산전 최대 '+(t.totalDays - t.minPostDays)+'일 사용 가능 (출산후 '+t.minPostDays+'일 의무 확보)</div>';
+    }
+    box.innerHTML = h;
+    var typeInfo = document.getElementById('m-typeinfo');
+    if(typeInfo) typeInfo.textContent = '📌 총 '+t.totalDays+'일 · 출산일 포함 출산 후 '+t.minPostDays+'일 이상 의무 사용 · 유급 '+t.paidDays+'일';
+
+    if(!s.usePrenatal){
+      document.getElementById('m-start').addEventListener('input', function(e){ self.state.startDate=e.target.value; self.updateResults(); });
+    }else{
+      document.getElementById('m-pstart').addEventListener('input', function(e){ self.state.prenatalStart=e.target.value; self.updatePUsed(); self.updateResults(); });
+      document.getElementById('m-pend').addEventListener('input', function(e){ self.state.prenatalEnd=e.target.value; self.updatePUsed(); self.updateResults(); });
+      document.getElementById('m-poststart').addEventListener('input', function(e){ self.state.postStart=e.target.value; self.updateResults(); });
+      this.updatePUsed();
+    }
+  },
+  updatePUsed:function(){
+    var s=this.state;
+    var el = document.getElementById('m-pused');
+    if(!el) return;
+    var used = diffDaysIncl(s.prenatalStart, s.prenatalEnd);
+    el.innerHTML = (s.prenatalStart && s.prenatalEnd && used) ? '출산전 사용일수: <b>'+used+'일</b>' : '';
+  },
+  updateResults:function(){
+    document.getElementById('m-results').innerHTML = this.compute();
+  },
+  compute:function(){
+    var s=this.state, t=this.currentType();
+    var totalDays=t.totalDays, minPostDays=t.minPostDays, paidDays=t.paidDays;
+    var prenatalUsed = (s.usePrenatal && s.prenatalStart && s.prenatalEnd) ? (diffDaysIncl(s.prenatalStart, s.prenatalEnd)||0) : 0;
+    var postDays = totalDays - prenatalUsed;
+    var wholeStart = s.usePrenatal ? s.prenatalStart : s.startDate;
+    var postActualStart = s.usePrenatal ? s.postStart : (s.startDate || s.birthDate);
+    var wholeEnd = s.usePrenatal
+      ? (postActualStart ? addDays(postActualStart, postDays-1) : null)
+      : (wholeStart ? addDays(wholeStart, totalDays-1) : null);
+    var actualPostDays = (s.birthDate && wholeEnd) ? diffDaysIncl(s.birthDate, wholeEnd) : postDays;
+    var postOk = actualPostDays >= minPostDays;
+    var paidStart = wholeStart || s.birthDate;
+    var paidEnd = paidStart ? addDays(paidStart, paidDays-1) : null;
+
+    if(!s.birthDate) return '';
+
+    var h = '<div class="blk"><div class="blk-tit">계산 결과</div>';
+    h += '<div class="res-box" style="background:#E8F0FB;">'
+      +'<div class="res-grid">'
+      +'<div class="res-num"><div class="l">총 휴가일수</div><div class="n" style="color:#1A4A8A;">'+totalDays+'</div><div class="u">일</div></div>'
+      +'<div class="res-num"><div class="l">출산후 사용일수</div><div class="n" style="color:'+(postOk?'#3B6D11':'#A32D2D')+';">'+actualPostDays+'</div><div class="u">일</div></div>'
+      +'</div><div class="res-status" style="color:'+(postOk?'#3B6D11':'#A32D2D')+';border-color:#1A4A8A30;">'
+      +(postOk ? ('✅ 출산 후 '+minPostDays+'일 이상 충족') : ('⚠️ 출산 후 '+minPostDays+'일 미충족 (현재 '+postDays+'일)'))
+      +'</div></div></div>';
+
+    h += '<div class="blk"><div class="blk-tit">일정표</div><div class="sched">';
+    if(!s.usePrenatal && s.startDate){
+      h += '<div class="row"><div class="rl" style="color:#1A4A8A;">휴가 시작일</div><div class="rd" style="color:#1A4A8A;"><b>'+fmt(s.startDate,true)+'</b></div></div>';
+    }
+    if(s.usePrenatal && s.prenatalStart && prenatalUsed>0){
+      h += '<div class="row"><div><div class="rl" style="color:#1A4A8A;">출산전 휴가</div><div class="rs">'+prenatalUsed+'일</div></div><div class="rd"><div>'+fmt(s.prenatalStart)+'</div><div class="sub">~ '+fmt(s.prenatalEnd)+'</div></div></div>';
+    }
+    h += '<div class="row" style="background:var(--pink);"><div class="rl" style="color:var(--pink-t);">출산일</div><div class="rd" style="color:var(--pink-t);"><b>'+fmt(s.birthDate,true)+'</b></div></div>';
+    h += '<div class="row"><div><div class="rl" style="color:#3B6D11;">출산후 휴가</div><div class="rs">'+postDays+'일</div></div><div class="rd"><div>'+fmt(postActualStart||s.birthDate)+'</div><div class="sub">~ '+fmt(wholeEnd)+'</div></div></div>';
+    if(paidEnd){
+      h += '<div class="row" style="background:#f6faf8;"><div><div class="rl">유급기간</div><div class="rs">'+paidDays+'일 (고용보험)</div></div><div class="rd"><div>'+fmt(paidStart)+'</div><div class="sub">~ '+fmt(paidEnd)+'</div></div></div>';
+    }
+    h += '</div></div>';
+
+    h += '<div class="blk" style="background:'+(postOk?'#EAF3DE':'#FCEBEB')+';border-radius:10px;padding:12px 14px;">'
+      +'<div style="font-weight:800;font-size:12.5px;color:'+(postOk?'#3B6D11':'#A32D2D')+';">'+(postOk?'✅':'⚠️')+' 출산 후 '+minPostDays+'일 이상 여부</div>'
+      +'<div style="font-size:12px;color:'+(postOk?'#3B6D11':'#A32D2D')+';margin-top:2px;">출산 후 '+actualPostDays+'일 '+(postOk?('≥ '+minPostDays+'일 충족'):('< '+minPostDays+'일 미충족'))+(s.usePrenatal&&prenatalUsed>0?(' (출산전 '+prenatalUsed+'일 분리사용)'):'')+'</div></div>';
+
+    h += '<div class="fine">※ 출산전 분리사용 시 출산 후 의무사용일수('+minPostDays+'일) 이상 확보 필요<br>※ 유급기간은 고용보험 기준이며 실제와 다를 수 있습니다.</div>';
+    return h;
+  }
+};
+
+/* ===================== 3) 육아휴직 ===================== */
+var Parental = {
+  state:{ spouseUsed:false, periods:Array.from({length:9},function(){return {start:'',end:''};}), expectedStart:'' },
+  render:function(){
+    var s=this.state;
+    var h='';
+    h+='<div class="blk"><div class="blk-tit">배우자 육아휴직 사용 여부</div>'
+      +'<div class="blk-sub">배우자가 3개월 이상 육아휴직 사용 시 본인 육아휴직 기간이 6개월 추가됩니다 (최대 18개월).</div>'
+      +'<div class="btn-row" id="pl-spouse">'
+      +'<div class="opt-btn'+(!s.spouseUsed?' on':'')+'" data-v="0"><span class="oi">👤</span>미사용 (12개월)</div>'
+      +'<div class="opt-btn'+(s.spouseUsed?' on':'')+'" data-v="1"><span class="oi">👫</span>3개월 이상 사용 (18개월)</div>'
+      +'</div></div>';
+
+    h+='<div class="blk"><div class="blk-tit">육아휴직 사용기간 입력 (최대 9회차)</div><div id="pl-periods">';
+    s.periods.forEach(function(p,i){
+      h+='<div class="period-row" id="pl-row-'+i+'"><div class="prh"><div class="idx">'+(i+1)+'회차</div>'
+        +'<input type="date" data-i="'+i+'" data-k="start" value="'+esc(p.start)+'">'
+        +'<span class="sep">~</span>'
+        +'<input type="date" data-i="'+i+'" data-k="end" value="'+esc(p.end)+'"></div>'
+        +'<div class="rout" id="pl-rout-'+i+'"></div></div>';
+    });
+    h+='</div></div>';
+
+    h+='<div class="blk"><div class="blk-tit">계산 결과</div><div id="pl-summary"></div></div>';
+    h+='<div class="blk" id="pl-sim-wrap"></div>';
+    h+='<div class="fine">※ 본 계산기는 참고용이며, 실제 사용기간과 일부 오차가 발생할 수 있습니다.<br>※ 월력 기준(엑셀 DATEDIF 방식)으로 계산됩니다.</div>';
+
+    app.innerHTML = h;
+    this.bindStatic();
+    this.updateAll();
+  },
+  bindStatic:function(){
+    var self=this;
+    document.querySelectorAll('#pl-spouse .opt-btn').forEach(function(el){
+      el.addEventListener('click', function(){ self.state.spouseUsed = el.getAttribute('data-v')==='1'; self.render(); });
+    });
+    document.querySelectorAll('#pl-periods input').forEach(function(el){
+      el.addEventListener('input', function(e){
+        var i=+el.getAttribute('data-i'), k=el.getAttribute('data-k');
+        self.state.periods[i][k] = e.target.value;
+        self.updateRow(i);
+        self.updateSummary();
+      });
+    });
+  },
+  updateRow:function(i){
+    var p=this.state.periods[i];
+    var r=calcMonthsAndDays(p.start,p.end);
+    var row=document.getElementById('pl-row-'+i);
+    var out=document.getElementById('pl-rout-'+i);
+    var hasData=p.start && p.end;
+    if(row) row.className='period-row'+(hasData&&r?' ok':'');
+    if(!out) return;
+    if(hasData && r) out.innerHTML='<div class="rres">✓ '+r.months+'개월 '+r.remainDays+'일 = '+r.total.toFixed(3)+'개월 <span style="color:var(--muted);font-weight:400;">('+r.months+' + '+r.remainDays+'/'+r.daysInMonth+')</span></div>';
+    else if(hasData && !r) out.innerHTML='<div class="rerr">⚠️ 종료일이 시작일보다 빠릅니다</div>';
+    else out.innerHTML='';
+  },
+  updateAll:function(){
+    var self=this;
+    this.state.periods.forEach(function(p,i){ self.updateRow(i); });
+    this.updateSummary();
+  },
+  updateSummary:function(){
+    var s=this.state;
+    var maxMonths = s.spouseUsed?18:12;
+    var calcResults = s.periods.map(function(p){return calcMonthsAndDays(p.start,p.end);});
+    var totalUsed = calcResults.reduce(function(sum,r){return sum+(r?r.total:0);},0);
+    var remaining = Math.max(0, maxMonths-totalUsed);
+    var isOver = totalUsed>maxMonths;
+
+    var h='<div class="res-box" style="background:'+(isOver?'#FCEBEB':'#EAF3DE')+';border:1px solid '+(isOver?'#A32D2D30':'#3B6D1130')+';">';
+    h+='<div class="res-grid">'
+      +'<div class="res-num"><div class="l">총 사용기간</div><div class="n" style="color:'+(isOver?'#A32D2D':'#3B6D11')+';">'+totalUsed.toFixed(3)+'</div><div class="u">개월</div></div>'
+      +'<div class="res-num"><div class="l">잔여기간</div><div class="n" style="color:'+(isOver?'#A32D2D':'#1A4A8A')+';">'+remaining.toFixed(3)+'</div><div class="u">개월</div></div>'
+      +'</div>';
+    if(totalUsed>0){
+      h+='<div class="res-formula"><div class="ft">📐 산식</div>';
+      calcResults.forEach(function(r,i){ if(r) h+='<div>'+(i+1)+'회차: '+r.months+' + '+r.remainDays+'/'+r.daysInMonth+' = '+r.total.toFixed(3)+'</div>'; });
+      h+='<div style="border-top:1px solid rgba(0,0,0,.1);margin-top:4px;padding-top:4px;font-weight:700;color:'+(isOver?'#A32D2D':'#3B6D11')+';">합계: '+calcResults.filter(function(r){return r;}).map(function(r){return r.total.toFixed(3);}).join(' + ')+' = '+totalUsed.toFixed(3)+'개월</div></div>';
+    }
+    h+='<div class="res-status" style="color:'+(isOver?'#A32D2D':'#3B6D11')+';">'
+      +(isOver ? ('⚠️ 최대 사용기간('+maxMonths+'개월) 초과!') : (totalUsed===0 ? ('최대 '+maxMonths+'개월 사용 가능') : ('✅ '+maxMonths+'개월 이내 ('+(maxMonths-totalUsed).toFixed(3)+'개월 남음)')))
+      +'</div></div>';
+    document.getElementById('pl-summary').innerHTML = h;
+
+    var simWrap = document.getElementById('pl-sim-wrap');
+    if(remaining>0){
+      simWrap.innerHTML = '<div class="blk-tit">잔여기간 모의계산</div>'
+        +'<div class="card" style="padding:14px;"><div class="form-group"><label class="form-label">예상 시작일</label><input type="date" id="pl-exp" value="'+esc(s.expectedStart)+'"></div>'
+        +'<div id="pl-expres" style="margin-top:10px;"></div></div>';
+      document.getElementById('pl-exp').addEventListener('input', function(e){ s.expectedStart=e.target.value; Parental.updateExpected(remaining); });
+      this.updateExpected(remaining);
+    } else {
+      simWrap.innerHTML='';
+    }
+  },
+  updateExpected:function(remaining){
+    var s=this.state;
+    var box=document.getElementById('pl-expres');
+    if(!box) return;
+    var end = s.expectedStart ? calcEndDate(s.expectedStart, remaining) : null;
+    box.innerHTML = end ? ('<div style="background:#E8F0FB;border-radius:8px;padding:10px 14px;">'
+      +'<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">예상 종료일</div>'
+      +'<div style="font-size:18px;font-weight:800;color:#1A4A8A;">'+fmt(end)+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-top:4px;">'+fmt(s.expectedStart)+' ~ '+fmt(end)+' ('+remaining.toFixed(3)+'개월)</div></div>') : '';
+  }
+};
+
+/* ===================== 4) 휴가·휴직 잔여기간 ===================== */
+var LeaveResidual = {
+  TYPES:[
+    {label:'질병휴직', maxDays:180},
+    {label:'난임휴직', maxDays:180},
+    {label:'가족돌봄휴직', maxDays:90},
+    {label:'가족돌봄휴가', maxDays:10},
+    {label:'질병휴가', maxDays:60}
+  ],
+  state:{ leaveType:'', periods:Array.from({length:5},function(){return {start:'',end:''};}), expectedStart:'', familyHolidayDays:0 },
+  render:function(){
+    var s=this.state;
+    var h='<div class="blk"><div class="blk-tit">휴가·휴직 구분</div><select id="lv-type">'
+      +'<option value="">선택하세요</option>';
+    this.TYPES.forEach(function(t){ h+='<option value="'+t.label+'"'+(s.leaveType===t.label?' selected':'')+'>'+t.label+' (최대 '+t.maxDays+'일)</option>'; });
+    h+='</select><div id="lv-typeinfo"></div>';
+    if(s.leaveType==='가족돌봄휴직'){
+      h+='<div class="form-group" style="margin-top:8px;"><label class="form-label">같은 연도 가족돌봄휴가 사용일수</label>'
+        +'<input type="number" id="lv-fam" min="0" max="10" value="'+esc(s.familyHolidayDays)+'"></div>';
+    }
+    h+='</div>';
+
+    if(s.leaveType){
+      h+='<div class="blk"><div class="blk-tit">사용기간 입력</div><div id="lv-periods">';
+      s.periods.forEach(function(p,i){
+        h+='<div class="period-row" id="lv-row-'+i+'"><div class="prh"><div class="idx">'+(i+1)+'회차</div>'
+          +'<input type="date" data-i="'+i+'" data-k="start" value="'+esc(p.start)+'">'
+          +'<span class="sep">~</span>'
+          +'<input type="date" data-i="'+i+'" data-k="end" value="'+esc(p.end)+'"></div>'
+          +'<div class="rout" id="lv-rout-'+i+'"></div></div>';
+      });
+      h+='</div></div>';
+      h+='<div class="blk"><div class="blk-tit">계산 결과</div><div id="lv-summary"></div></div>';
+      h+='<div class="blk" id="lv-sim-wrap"></div>';
+      h+='<div class="fine">※ 본 계산기는 참고용이며, 실제 사용기간과 일부 오차가 발생할 수 있습니다.<br>※ 일력 기준으로 계산됩니다.</div>';
+    }
+
+    app.innerHTML = h;
+    this.bindStatic();
+    if(s.leaveType) this.updateAll();
+  },
+  bindStatic:function(){
+    var self=this;
+    document.getElementById('lv-type').addEventListener('change', function(e){
+      self.state.leaveType = e.target.value;
+      self.state.periods = Array.from({length:5},function(){return {start:'',end:''};});
+      self.state.expectedStart=''; self.state.familyHolidayDays=0;
+      self.render();
+    });
+    var typeInfo = document.getElementById('lv-typeinfo');
+    var t = this.TYPES.find(function(t){return t.label===self.state.leaveType;});
+    if(t){
+      typeInfo.className='info-line';
+      typeInfo.innerHTML = '📌 '+t.label+' 최대 사용기간: <b>'+t.maxDays+'일</b>'+(t.label==='가족돌봄휴직'?'<span style="color:var(--red-t);"> (같은 연도 가족돌봄휴가 사용일 차감)</span>':'');
+    }
+    var famInput = document.getElementById('lv-fam');
+    if(famInput) famInput.addEventListener('input', function(e){ self.state.familyHolidayDays = e.target.value; self.updateSummary(); });
+    document.querySelectorAll('#lv-periods input').forEach(function(el){
+      el.addEventListener('input', function(e){
+        var i=+el.getAttribute('data-i'), k=el.getAttribute('data-k');
+        self.state.periods[i][k] = e.target.value;
+        self.updateRow(i);
+        self.updateSummary();
+      });
+    });
+  },
+  updateRow:function(i){
+    var p=this.state.periods[i];
+    var d=diffDaysIncl(p.start,p.end);
+    var row=document.getElementById('lv-row-'+i);
+    var out=document.getElementById('lv-rout-'+i);
+    var hasData=p.start&&p.end;
+    if(row) row.className='period-row'+(hasData&&d?' ok':'');
+    if(!out) return;
+    if(hasData&&d) out.innerHTML='<div class="rres">✓ '+d+'일</div>';
+    else if(hasData&&!d) out.innerHTML='<div class="rerr">⚠️ 종료일이 시작일보다 빠릅니다</div>';
+    else out.innerHTML='';
+  },
+  updateAll:function(){
+    var self=this;
+    this.state.periods.forEach(function(p,i){ self.updateRow(i); });
+    this.updateSummary();
+  },
+  updateSummary:function(){
+    var s=this.state;
+    var t=this.TYPES.find(function(t){return t.label===s.leaveType;});
+    if(!t) return;
+    var maxDays=t.maxDays;
+    var isFamily = s.leaveType==='가족돌봄휴직';
+    var dayResults = s.periods.map(function(p){return diffDaysIncl(p.start,p.end);});
+    var totalUsed = dayResults.reduce(function(sum,d){return sum+(d||0);},0);
+    var deduct = isFamily ? (Number(s.familyHolidayDays)||0) : 0;
+    var remaining = Math.max(0, maxDays-totalUsed-deduct);
+    var isOver = maxDays>0 && (totalUsed+deduct)>maxDays;
+
+    var h='<div class="res-box" style="background:'+(isOver?'#FCEBEB':'#FAEEDA')+';border:1px solid '+(isOver?'#A32D2D30':'#854F0B30')+';">';
+    h+='<div class="res-grid">'
+      +'<div class="res-num"><div class="l">총 사용일수</div><div class="n" style="color:'+(isOver?'#A32D2D':'#854F0B')+';">'+totalUsed+'</div><div class="u">일</div></div>'
+      +'<div class="res-num"><div class="l">잔여일수</div><div class="n" style="color:'+(isOver?'#A32D2D':'#1A4A8A')+';">'+remaining+'</div><div class="u">일</div></div>'
+      +'</div>';
+    if(totalUsed>0){
+      h+='<div class="res-formula"><div class="ft">📐 산식</div>';
+      dayResults.forEach(function(d,i){ if(d) h+='<div>'+(i+1)+'회차: '+s.periods[i].start+' ~ '+s.periods[i].end+' = '+d+'일</div>'; });
+      h+='<div style="border-top:1px solid rgba(0,0,0,.1);margin-top:4px;padding-top:4px;font-weight:700;color:'+(isOver?'#A32D2D':'#854F0B')+';">합계: '+dayResults.filter(function(d){return d;}).join(' + ')+' = '+totalUsed+'일'+(isFamily&&deduct>0?(' + 휴가 '+deduct+'일'):'')+' / 최대 '+maxDays+'일</div></div>';
+    }
+    h+='<div class="res-status" style="color:'+(isOver?'#A32D2D':'#854F0B')+';">'
+      +(isOver ? ('⚠️ 최대 사용기간('+maxDays+'일) 초과!') : (totalUsed===0&&deduct===0 ? ('최대 '+maxDays+'일 사용 가능') : ('✅ '+maxDays+'일 이내 ('+remaining+'일 남음'+(deduct>0?(', 휴가 '+deduct+'일 차감'):'')+')')))
+      +'</div></div>';
+    document.getElementById('lv-summary').innerHTML = h;
+
+    var simWrap = document.getElementById('lv-sim-wrap');
+    if(remaining>0){
+      simWrap.innerHTML = '<div class="blk-tit">잔여기간 모의계산</div>'
+        +'<div class="card" style="padding:14px;"><div class="form-group"><label class="form-label">예상 시작일</label><input type="date" id="lv-exp" value="'+esc(s.expectedStart)+'"></div>'
+        +'<div id="lv-expres" style="margin-top:10px;"></div></div>';
+      document.getElementById('lv-exp').addEventListener('input', function(e){ s.expectedStart=e.target.value; LeaveResidual.updateExpected(remaining); });
+      this.updateExpected(remaining);
+    } else {
+      simWrap.innerHTML='';
+    }
+  },
+  updateExpected:function(remaining){
+    var s=this.state;
+    var box=document.getElementById('lv-expres');
+    if(!box) return;
+    var end=null;
+    if(s.expectedStart && remaining>0) end = addDays(s.expectedStart, remaining-1);
+    box.innerHTML = end ? ('<div style="background:#E8F0FB;border-radius:8px;padding:10px 14px;">'
+      +'<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">예상 종료일</div>'
+      +'<div style="font-size:18px;font-weight:800;color:#1A4A8A;">'+fmt(end)+'</div>'
+      +'<div style="font-size:11px;color:var(--muted);margin-top:4px;">'+fmt(s.expectedStart)+' ~ '+fmt(end)+' ('+remaining+'일)</div></div>') : '';
+  }
+};
+
+/* ===================== 탭 전환 ===================== */
+var CALCS = {pregnancy:Pregnancy, maternity:Maternity, parental:Parental, leave:LeaveResidual};
+document.querySelectorAll('#tabs .tab').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('#tabs .tab').forEach(function(t){t.classList.remove('on');});
+    tab.classList.add('on');
+    CALCS[tab.getAttribute('data-c')].render();
+  });
+});
+Pregnancy.render();
+</script>
+</body>
+</html>
