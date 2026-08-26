@@ -104,7 +104,8 @@
   .forms-tit{text-align:center;margin-bottom:24px;}
   .forms-tit h3{font-size:clamp(20px,3vw,26px);font-weight:800;letter-spacing:-.5px;color:var(--db-dark);margin-top:8px;}
   .forms-tit p{color:var(--muted);font-size:14px;margin-top:8px;}
-  .forms-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  .forms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:820px){.forms-grid{grid-template-columns:repeat(2,1fr);}}
   .form-card{display:flex;align-items:center;gap:14px;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;transition:.18s;}
   .form-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(20,36,28,.1);border-color:var(--db-green);}
   .fc-ico{flex:none;width:46px;height:46px;border-radius:13px;background:var(--mint);display:flex;align-items:center;justify-content:center;font-size:23px;}
@@ -220,6 +221,11 @@
       <a class="form-card" href="forms/복직원.doc" download>
         <div class="fc-ico">📄</div>
         <div class="fc-txt"><div class="fc-nm">복직원</div><div class="fc-sub">휴직 종료·복직 시 제출</div></div>
+        <div class="fc-dl">받기 ⬇</div>
+      </a>
+      <a class="form-card" href="forms/단축근무신청서.xls" download>
+        <div class="fc-ico">📄</div>
+        <div class="fc-txt"><div class="fc-nm">단축근무 신청서</div><div class="fc-sub">임신중·육아기 근로시간 단축 신청</div></div>
         <div class="fc-dl">받기 ⬇</div>
       </a>
     </div>
