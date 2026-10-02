@@ -122,34 +122,57 @@ function diffDaysIncl(s1, s2){
   var d = Math.round((parseD(s2)-parseD(s1))/86400000)+1;
   return d>0 ? d : null;
 }
-// 엑셀 DATEDIF 방식 개월+일 합산 (육아휴직 계산기용)
+/* --- 육아휴직 계산기: 고용노동부 「육아휴직 분할사용 합산기간 계산」 엑셀 수식 그대로 이식 --- */
+function daysBetween(a, b){return Math.round((b-a)/86400000);}
+// 엑셀 ROUNDDOWN(x, n). 부동소수 오차(예: 2.9999999)로 1 작게 잘리는 것 방지
+function rdown(x, n){var p=Math.pow(10,n); return Math.floor(Math.round(x*p*1e6)/1e6)/p;}
+// 엑셀 DATEDIF(s, e, "m")
+function datedifM(s, e){
+  var m=(e.getFullYear()-s.getFullYear())*12+(e.getMonth()-s.getMonth());
+  if(e.getDate()<s.getDate()) m--;
+  return m;
+}
+// 엑셀 DATEDIF(s, e, "md") — 엑셀처럼 음수가 나올 수 있음(예: 1/31 → 3/1 = -2)
+function datedifMD(s, e){
+  if(e.getDate()>=s.getDate()) return e.getDate()-s.getDate();
+  return daysBetween(new Date(e.getFullYear(), e.getMonth()-1, s.getDate()), e);
+}
+// 엑셀 EDATE(d, n) — 말일 넘치면 그 달 말일로 맞춤
+function edate(d, n){
+  var y=d.getFullYear(), m=d.getMonth()+n;
+  var last=new Date(y, m+1, 0).getDate();
+  return new Date(y, m, Math.min(d.getDate(), last));
+}
+// 회차별 사용기간 (시트 E~K열)
 function calcMonthsAndDays(startStr, endStr){
   if(!startStr || !endStr) return null;
-  var start = parseD(startStr);
-  var end = parseD(endStr);
-  end.setDate(end.getDate()+1);
-  if(end <= start) return null;
-  var months = (end.getFullYear()-start.getFullYear())*12 + (end.getMonth()-start.getMonth());
-  var t1 = new Date(start); t1.setMonth(t1.getMonth()+months);
-  if(t1 > end) months -= 1;
-  var t2 = new Date(start); t2.setMonth(t2.getMonth()+months);
-  var remainDays = Math.round((end-t2)/86400000);
-  if(remainDays < 0) remainDays = 0;
-  var daysInMonth = new Date(end.getFullYear(), end.getMonth()+1, 0).getDate();
-  var fraction = Math.floor((remainDays/daysInMonth)*1000)/1000;
-  var total = Math.floor((months+fraction)*1000)/1000;
-  return {months:months, remainDays:remainDays, daysInMonth:daysInMonth, fraction:fraction, total:total};
+  var s = parseD(startStr);
+  var e = parseD(endStr); e.setDate(e.getDate()+1);            // D+1
+  if(e <= s) return null;
+  var M  = datedifM(s, e);                                       // E: 개월(M)
+  var md = datedifMD(s, e);
+  var D  = md<0 ? 0 : md;                                        // F: 일(D)
+  var G  = new Date(s.getFullYear(), s.getMonth()+M, s.getDate()); // G: 일할계산 시작일
+  if(md<0) G.setDate(G.getDate()+md);
+  var H  = new Date(s.getFullYear(), s.getMonth()+M+1, s.getDate()); // H: 일할계산 종료일
+  H.setDate(H.getDate()-1);
+  var C  = daysBetween(G, H)+1;                                  // I: 일할계산 분모(C)
+  var J  = rdown(D/C, 3);                                        // J: D/C
+  var K  = rdown(M+J, 3);                                        // K: M + D/C
+  return {months:M, remainDays:D, daysInMonth:C, fraction:J, total:K, calcStart:toISO(G), calcEnd:toISO(H)};
 }
+// 잔여기간 예상 종료일 (시트 M~V열)
 function calcEndDate(startStr, remainMonths){
-  if(!startStr || remainMonths<=0) return null;
-  var start = parseD(startStr);
-  var fullMonths = Math.floor(remainMonths);
-  var fraction = remainMonths - fullMonths;
-  var q = new Date(start); q.setMonth(q.getMonth()+fullMonths);
-  var daysInMonth = new Date(q.getFullYear(), q.getMonth()+1, 0).getDate();
-  var extraDays = Math.floor(fraction*daysInMonth);
-  q.setDate(q.getDate()-1+extraDays);
-  return toISO(q);
+  var M = Math.round(remainMonths*1000)/1000;                    // M: 잔여개월수
+  if(!startStr || M<=0) return null;
+  var N = Math.floor(M);                                         // N: ROUNDDOWN(M,0)
+  var O = M - N;                                                 // O: 소수부
+  var R = edate(parseD(startStr), N);                            // R = Q+1 = EDATE(P,N)
+  var Q = new Date(R); Q.setDate(Q.getDate()-1);                 // Q = EDATE(P,N)-1
+  var T = edate(R, 1); T.setDate(T.getDate()-1);                 // T = EDATE(R,1)-1
+  var U = daysBetween(R, T)+1;                                   // U: 일할 분모
+  var V = new Date(Q); V.setDate(V.getDate()+rdown(O*U, 0));     // V = Q + ROUNDDOWN(O*U,0)
+  return toISO(V);
 }
 function todayISO(){var d=new Date(); return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
 function esc(s){return (s==null?'':String(s));}
@@ -366,11 +389,11 @@ var Parental = {
   render:function(){
     var s=this.state;
     var h='';
-    h+='<div class="blk"><div class="blk-tit">배우자 육아휴직 사용 여부</div>'
-      +'<div class="blk-sub">배우자가 3개월 이상 육아휴직 사용 시 본인 육아휴직 기간이 6개월 추가됩니다 (최대 18개월).</div>'
+    h+='<div class="blk"><div class="blk-tit">기간 연장(6개월 추가) 해당 여부</div>'
+      +'<div class="blk-sub">부모 모두 같은 자녀로 3개월 이상 사용·한부모·중증장애아동 부모 등 연장 요건에 해당하면 6개월이 추가됩니다 (최대 18개월).</div>'
       +'<div class="btn-row" id="pl-spouse">'
-      +'<div class="opt-btn'+(!s.spouseUsed?' on':'')+'" data-v="0"><span class="oi">👤</span>미사용 (12개월)</div>'
-      +'<div class="opt-btn'+(s.spouseUsed?' on':'')+'" data-v="1"><span class="oi">👫</span>3개월 이상 사용 (18개월)</div>'
+      +'<div class="opt-btn'+(!s.spouseUsed?' on':'')+'" data-v="0"><span class="oi">👤</span>기본 (12개월)</div>'
+      +'<div class="opt-btn'+(s.spouseUsed?' on':'')+'" data-v="1"><span class="oi">👫</span>6개월 추가 (18개월)</div>'
       +'</div></div>';
 
     h+='<div class="blk"><div class="blk-tit">육아휴직 사용기간 입력 (최대 9회차)</div><div id="pl-periods">';
@@ -385,7 +408,7 @@ var Parental = {
 
     h+='<div class="blk"><div class="blk-tit">계산 결과</div><div id="pl-summary"></div></div>';
     h+='<div class="blk" id="pl-sim-wrap"></div>';
-    h+='<div class="fine">※ 본 계산기는 참고용이며, 실제 사용기간과 일부 오차가 발생할 수 있습니다.<br>※ 월력 기준(엑셀 DATEDIF 방식)으로 계산됩니다.</div>';
+    h+='<div class="fine">※ 본 계산기는 참고용이며, 실제 사용기간과 일부 오차가 발생할 수 있습니다.<br>※ 고용노동부 「육아휴직 분할사용 합산기간 계산」 엑셀(여성고용정책과-326, 2020.1.16.)과 동일한 산식입니다.<br>※ 중단 없이 연이어 사용한 기간은 회차를 나누지 말고 한 줄로 입력하세요.</div>';
 
     app.innerHTML = h;
     this.bindStatic();
@@ -413,7 +436,7 @@ var Parental = {
     var hasData=p.start && p.end;
     if(row) row.className='period-row'+(hasData&&r?' ok':'');
     if(!out) return;
-    if(hasData && r) out.innerHTML='<div class="rres">✓ '+r.months+'개월 '+r.remainDays+'일 = '+r.total.toFixed(3)+'개월 <span style="color:var(--muted);font-weight:400;">('+r.months+' + '+r.remainDays+'/'+r.daysInMonth+')</span></div>';
+    if(hasData && r) out.innerHTML='<div class="rres">✓ '+r.months+'개월 '+r.remainDays+'일 = '+r.total.toFixed(3)+'개월 <span style="color:var(--muted);font-weight:400;">('+r.months+' + '+r.remainDays+'/'+r.daysInMonth+(r.remainDays>0?', 일할기간 '+fmt(r.calcStart)+'~'+fmt(r.calcEnd):'')+')</span></div>';
     else if(hasData && !r) out.innerHTML='<div class="rerr">⚠️ 종료일이 시작일보다 빠릅니다</div>';
     else out.innerHTML='';
   },
@@ -426,8 +449,8 @@ var Parental = {
     var s=this.state;
     var maxMonths = s.spouseUsed?18:12;
     var calcResults = s.periods.map(function(p){return calcMonthsAndDays(p.start,p.end);});
-    var totalUsed = calcResults.reduce(function(sum,r){return sum+(r?r.total:0);},0);
-    var remaining = Math.max(0, maxMonths-totalUsed);
+    var totalUsed = Math.round(calcResults.reduce(function(sum,r){return sum+(r?r.total:0);},0)*1000)/1000;
+    var remaining = Math.max(0, Math.round((maxMonths-totalUsed)*1000)/1000);
     var isOver = totalUsed>maxMonths;
 
     var h='<div class="res-box" style="background:'+(isOver?'#FCEBEB':'#EAF3DE')+';border:1px solid '+(isOver?'#A32D2D30':'#3B6D1130')+';">';
